@@ -1,0 +1,282 @@
+
+/* =========================================
+   FAMILY PHOTO 3D GALLERY
+========================================= */
+
+.gallery-section {
+  position: relative;
+  width: 100%;
+  padding: 90px 20px 75px;
+  overflow: hidden;
+  text-align: center;
+  background: linear-gradient(
+    135deg,
+    #fff8f4,
+    #fff0eb,
+    #fffaf2
+  );
+}
+
+.gallery-heading {
+  margin-bottom: 45px;
+}
+
+.gallery-subtitle {
+  color: #b77955;
+  letter-spacing: 5px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.gallery-heading h2 {
+  font-family: "Great Vibes", cursive;
+  font-size: clamp(42px, 6vw, 65px);
+  color: #743e39;
+  margin: 12px 0;
+}
+
+.gallery-heading p {
+  color: #987b73;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 20px;
+}
+
+.gallery-heart {
+  display: block;
+  margin-top: 15px;
+  color: #c58a79;
+  font-size: 27px;
+}
+
+/* 3D SLIDER */
+
+.gallery-3d {
+  position: relative;
+  width: 100%;
+  height: 540px;
+  max-width: 1250px;
+  margin: 0 auto;
+  perspective: 1600px;
+  transform-style: preserve-3d;
+}
+
+/* WIDE FAMILY PHOTO CARD */
+
+.gallery-card {
+  position: absolute;
+  top: 0;
+  left: 50%;
+
+  width: min(850px, 76vw);
+  height: 480px;
+
+  margin-left: 0;
+  padding: 10px;
+
+  background: white;
+  border: 2px solid #e8c89c;
+  border-radius: 20px;
+
+  box-shadow:
+    0 20px 45px rgba(80, 40, 30, 0.2),
+    0 5px 15px rgba(122, 16, 48, 0.1);
+
+  cursor: pointer;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+
+  transition:
+    transform .9s cubic-bezier(.22, 1, .36, 1),
+    opacity .8s ease,
+    box-shadow .5s ease,
+    filter .8s ease;
+}
+
+.gallery-card.active {
+  box-shadow:
+    0 25px 65px rgba(80, 40, 30, 0.3),
+    0 0 25px rgba(200, 150, 46, 0.3);
+
+  filter: brightness(1);
+}
+
+.gallery-card:not(.active) {
+  filter: brightness(.78);
+}
+
+/* SHOW COMPLETE FAMILY PHOTO */
+
+.gallery-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+  object-position: center;
+
+  background: #f8eee7;
+  border-radius: 13px;
+
+  transition: transform .9s ease;
+}
+
+.gallery-card.active img {
+  transform: scale(1);
+}
+
+/* PHOTO LABEL */
+
+.gallery-photo-label {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+
+  padding: 25px 10px 15px;
+
+  color: white;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 22px;
+
+  background: linear-gradient(
+    transparent,
+    rgba(40, 10, 20, .85)
+  );
+
+  border-radius: 0 0 13px 13px;
+}
+
+.gallery-photo-label span {
+  color: #ffd58b;
+  margin-right: 8px;
+}
+
+/* CONTROLS */
+
+.gallery-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  margin-top: 15px;
+}
+
+.gallery-controls button {
+  width: 46px;
+  height: 46px;
+  border: 1px solid #c58a79;
+  border-radius: 50%;
+  color: #743e39;
+  background: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all .3s ease;
+}
+
+.gallery-controls button:hover {
+  background: #743e39;
+  color: white;
+  transform: scale(1.1);
+}
+
+.gallery-counter {
+  min-width: 65px;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 20px;
+  color: #743e39;
+}
+
+/* DOTS */
+
+.gallery-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  margin-top: 22px;
+}
+
+.gallery-dots button {
+  width: 8px;
+  height: 8px;
+  border: none;
+  border-radius: 50%;
+  background: #d9b9ad;
+  cursor: pointer;
+  transition: all .3s ease;
+}
+
+.gallery-dots button.active {
+  width: 25px;
+  border-radius: 20px;
+  background: #743e39;
+}
+
+.gallery-auto-text {
+  margin-top: 20px;
+  color: #987b73;
+  font-size: 12px;
+}
+
+/* TABLET */
+
+@media (max-width: 900px) {
+  .gallery-3d {
+    height: 440px;
+  }
+
+  .gallery-card {
+    width: 85vw;
+    height: 390px;
+  }
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+  .gallery-section {
+    padding: 65px 8px;
+  }
+
+  .gallery-heading {
+    margin-bottom: 30px;
+  }
+
+  .gallery-3d {
+    height: 330px;
+    perspective: 1000px;
+  }
+
+  .gallery-card {
+    width: 94vw;
+    height: 285px;
+    padding: 6px;
+    border-radius: 14px;
+  }
+
+  .gallery-card img {
+    border-radius: 9px;
+  }
+
+  .gallery-photo-label {
+    font-size: 17px;
+  }
+
+  .gallery-controls button {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* SMALL MOBILE */
+
+@media (max-width: 360px) {
+  .gallery-3d {
+    height: 290px;
+  }
+
+  .gallery-card {
+    height: 250px;
+  }
+}
