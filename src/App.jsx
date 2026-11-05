@@ -663,9 +663,7 @@ export default function App() {
 
         <h2 className="script">Together Forever</h2>
 
-        <p>
-          Your presence and blessings mean the world to us.
-        </p>
+       <p >Your presence is the greatest gift</p>
 
         <p className="footer-names">
           {COUPLE.groom} &amp; {COUPLE.bride}
