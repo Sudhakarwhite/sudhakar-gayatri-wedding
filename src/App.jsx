@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./styles.css";
 
 /* =========================================
@@ -43,7 +44,7 @@ const EVENTS = [
   {
     icon: "🎉",
     title: "Reception",
-    date: "Thursday, 10 December 2026",
+    date: "Monday, 14 December 2026",
     time: "6:30 PM onwards",
     place: "Raj Mahal, Kovilpatti, Tamil Nadu",
     map: "https://maps.app.goo.gl/BK7i4uw9iXhiyJYx5",
@@ -199,12 +200,9 @@ function Person({ img, name, side }) {
   );
 }
 
-
 /* =========================================
    3D WEDDING GALLERY SLIDER
 ========================================= */
-
-
 
 function Gallery3D() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -242,9 +240,7 @@ function Gallery3D() {
   return (
     <section className="gallery-section">
       <div className="gallery-heading reveal">
-        <span className="gallery-subtitle">
-          OUR BEAUTIFUL MOMENTS
-        </span>
+        <span className="gallery-subtitle">OUR BEAUTIFUL MOMENTS</span>
 
         <h2>Our Family Gallery</h2>
 
@@ -337,8 +333,6 @@ function Gallery3D() {
   );
 }
 
-
-
 /* =========================================
    EVENT CARD
 ========================================= */
@@ -349,6 +343,7 @@ function EventCard({ event }) {
       {event.status === "completed" && (
         <span className="event-status">✓ Completed</span>
       )}
+
       <div className="event-icon">{event.icon}</div>
 
       <h3>{event.title}</h3>
@@ -378,10 +373,135 @@ function EventCard({ event }) {
 export default function App() {
   const countdown = useCountdown(WEDDING_TIME.getTime());
 
+  const audioRef = useRef(null);
+
+  const [musicState, setMusicState] = useState("starting");
+
   useReveal();
+
+  /* =========================================
+     MUSIC AUTOPLAY + FIRST INTERACTION
+  ========================================= */
+
+  useEffect(() => {
+    const audio = audioRef.current;
+
+    if (!audio) return;
+
+    audio.volume = 0.5;
+
+    let manuallyPaused = false;
+
+    const startMusic = async () => {
+      if (!audio.paused || manuallyPaused) return;
+
+      try {
+        await audio.play();
+        setMusicState("playing");
+      } catch (error) {
+        if (error.name === "NotAllowedError") {
+          setMusicState("blocked");
+        } else {
+          console.error("Could not play the wedding song.", error);
+          setMusicState("error");
+        }
+      }
+    };
+
+    // Try autoplay when website loads
+    startMusic();
+
+    // Browser-blocked autoplay fallback
+    const handleFirstInteraction = () => {
+      if (!manuallyPaused) {
+        startMusic();
+      }
+
+      document.removeEventListener("click", handleFirstInteraction);
+      document.removeEventListener("touchstart", handleFirstInteraction);
+      document.removeEventListener("keydown", handleFirstInteraction);
+    };
+
+    document.addEventListener("click", handleFirstInteraction);
+    document.addEventListener("touchstart", handleFirstInteraction);
+    document.addEventListener("keydown", handleFirstInteraction);
+
+    return () => {
+      document.removeEventListener("click", handleFirstInteraction);
+      document.removeEventListener("touchstart", handleFirstInteraction);
+      document.removeEventListener("keydown", handleFirstInteraction);
+    };
+  }, []);
+
+  /* =========================================
+     MUSIC BUTTON
+  ========================================= */
+
+  const toggleMusic = async () => {
+    const audio = audioRef.current;
+
+    if (!audio) return;
+
+    if (audio.paused) {
+      try {
+        await audio.play();
+        setMusicState("playing");
+      } catch (error) {
+        console.error("Could not play the wedding song.", error);
+        setMusicState("error");
+      }
+    } else {
+      audio.pause();
+      setMusicState("paused");
+    }
+  };
 
   return (
     <main className="wedding-app">
+      {/* BACKGROUND WEDDING MUSIC */}
+
+      <audio
+        ref={audioRef}
+        src="/audio/sudhakar-gayatri.mpeg"
+        autoPlay
+        loop
+        preload="auto"
+        onPlay={() => setMusicState("playing")}
+        onPause={() => setMusicState("paused")}
+        onError={() => {
+          console.error("The wedding song could not be loaded.");
+          setMusicState("error");
+        }}
+      />
+
+      {/* MUSIC CONTROL BUTTON */}
+
+      <button
+        className="music-toggle"
+        type="button"
+        onClick={toggleMusic}
+        aria-label={
+          musicState === "playing"
+            ? "Pause wedding song"
+            : "Play wedding song"
+        }
+        title={
+          musicState === "playing"
+            ? "Pause wedding song"
+            : "Play wedding song"
+        }
+      >
+        {musicState === "playing"
+          ? "♫ Music On"
+          : musicState === "blocked"
+            ? "▶ Tap to Play Music"
+            : musicState === "paused"
+              ? "▶ Resume Music"
+              : musicState === "error"
+                ? "⚠ Music Unavailable"
+                : "♫ Play Music"}
+      </button>
+
       <Petals />
 
       {/* 1. WELCOME */}
@@ -395,7 +515,9 @@ export default function App() {
         />
 
         <div className="welcome-overlay">
-          <p className="welcome-blessing">With the blessings of God</p>
+          <p className="welcome-blessing">
+            With the blessings of God
+          </p>
 
           <div className="welcome-symbol">ॐ</div>
 
@@ -419,11 +541,19 @@ export default function App() {
 
       {/* 2. BRIDE PHOTO */}
 
-      <Person side="bride" img="/gayatri.png" name={COUPLE.bride} />
+      <Person
+        side="bride"
+        img="/gayatri.png"
+        name={COUPLE.bride}
+      />
 
       {/* 3. GROOM PHOTO */}
 
-      <Person side="groom" img="/Sudhakar.jpg" name={COUPLE.groom} />
+      <Person
+        side="groom"
+        img="/Sudhakar.jpg"
+        name={COUPLE.groom}
+      />
 
       {/* 4. WEDDING EVENTS */}
 
@@ -450,9 +580,13 @@ export default function App() {
       {/* 6. COUNTDOWN */}
 
       <section className="countdown-section">
-        <p className="eyebrow reveal">The big day is approaching</p>
+        <p className="eyebrow reveal">
+          The big day is approaching
+        </p>
 
-        <h2 className="script reveal">Counting Down to Our Wedding</h2>
+        <h2 className="script reveal">
+          Counting Down to Our Wedding
+        </h2>
 
         <div className="countdown-grid reveal">
           {[
@@ -462,13 +596,18 @@ export default function App() {
             ["Seconds", countdown.secs],
           ].map(([label, value]) => (
             <div className="countdown-box" key={label}>
-              <strong key={value}>{String(value).padStart(2, "0")}</strong>
+              <strong key={value}>
+                {String(value).padStart(2, "0")}
+              </strong>
+
               <span>{label}</span>
             </div>
           ))}
         </div>
 
-        <p className="countdown-message">A new chapter of love begins ❤️</p>
+        <p className="countdown-message">
+          A new chapter of love begins ❤️
+        </p>
       </section>
 
       {/* 7. VENUES */}
@@ -481,8 +620,11 @@ export default function App() {
         <div className="venue-grid">
           <article className="venue-card reveal">
             <div className="venue-icon">🛕</div>
+
             <h3>Wedding Temple</h3>
+
             <p>Sri Jaganatha Perumal ThiruKovil</p>
+
             <span>Coimbatore, Tamil Nadu</span>
 
             <a
@@ -496,8 +638,11 @@ export default function App() {
 
           <article className="venue-card reveal">
             <div className="venue-icon">🏛️</div>
+
             <h3>Wedding Hall</h3>
+
             <p>Shree Aksshayam</p>
+
             <span>Peelamedu, Coimbatore</span>
 
             <a
@@ -509,16 +654,6 @@ export default function App() {
             </a>
           </article>
         </div>
-
-        {/* <div className="venue-map reveal">
-          <iframe
-            title="Wedding venue map"
-            loading="lazy"
-            src="https://www.google.com/maps?q=Shree+Aksshayam+Peelamedu+Coimbatore&output=embed"
-            allowFullScreen
-            referrerPolicy="no-referrer-when-downgrade"
-          />
-        </div> */}
       </section>
 
       {/* 8. FOOTER */}
@@ -528,15 +663,21 @@ export default function App() {
 
         <h2 className="script">Together Forever</h2>
 
-        <p>Your presence and blessings mean the world to us.</p>
+        <p>
+          Your presence and blessings mean the world to us.
+        </p>
 
         <p className="footer-names">
           {COUPLE.groom} &amp; {COUPLE.bride}
         </p>
 
-        <p className="footer-tamil">அன்புடன் வரவேற்கிறோம்</p>
+        <p className="footer-tamil">
+          அன்புடன் வரவேற்கிறோம்
+        </p>
 
-        <p className="footer-date">10 December 2026</p>
+        <p className="footer-date">
+          10 December 2026
+        </p>
       </footer>
     </main>
   );

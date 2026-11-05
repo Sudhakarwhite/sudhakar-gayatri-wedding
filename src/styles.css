@@ -950,6 +950,27 @@ img {
   font-size: .75rem !important;
 }
 
+.music-toggle {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 30;
+  padding: .7rem 1rem;
+  border: 1px solid var(--light-gold);
+  border-radius: 50px;
+  color: var(--light-gold);
+  background: var(--dark-maroon);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .25);
+  font: inherit;
+  font-size: .8rem;
+  cursor: pointer;
+}
+
+.music-toggle:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+
 /* =========================================
    FLOWER PETALS
 ========================================= */
